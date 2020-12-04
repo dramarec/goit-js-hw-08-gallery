@@ -23,6 +23,9 @@ const createMarkup = galleryItems.reduce(
     '',
 );
 
+galleriesRef.insertAdjacentHTML('afterbegin', createMarkup);
+galleriesRef.addEventListener('click', openModal);
+
 function openModal(event) {
     event.preventDefault();
     if (event.target.nodeName !== 'IMG') return;
@@ -30,14 +33,18 @@ function openModal(event) {
     lightboxRef.classList.add('is-open');
     lightBoxImageRef.src = event.target.dataset.source;
     lightBoxImageRef.alt = event.target.alt;
-    addEventListener('keydown', keyPress);
+    window.addEventListener('keydown', keyPress);
+    closeBtnRef.addEventListener('click', closeModal);
+    backdropOverlayRef.addEventListener('click', closeModal);
+
 }
 
 function closeModal() {
     lightboxRef.classList.remove('is-open');
     lightBoxImageRef.src = '';
-    removeEventListener('click', closeModal);
-    removeEventListener('keydown', keyPress);
+    backdropOverlayRef.removeEventListener('click', closeModal);
+    closeBtnRef.removeEventListener('click', closeModal);
+    window.removeEventListener('keydown', keyPress);
 }
 
 function keyPress(event) {
@@ -45,22 +52,16 @@ function keyPress(event) {
         closeModal();
     }
     if (event.code === 'ArrowLeft') {
-        if (currentIndex !== 0) {
-            lightBoxImageRef.src = galleryItems[currentIndex - 1].original;
-            return (currentIndex -= 1);
-        }
-        return;
+        currentIndex > 0 && currentIndex <= galleryItems.length - 1
+            ? (currentIndex -= 1)
+            : (currentIndex = galleryItems.length - 1)
+        lightBoxImageRef.src = galleryItems[currentIndex].original;
     }
     if (event.code === 'ArrowRight') {
-        if (currentIndex < galleryItems.length - 1) {
-            lightBoxImageRef.src = galleryItems[currentIndex + 1].original;
-            return (currentIndex += 1);
-        }
-        return;
+        currentIndex >= 0 && currentIndex < galleryItems.length - 1
+            ? (currentIndex += 1)
+            : (currentIndex = 0)
+        lightBoxImageRef.src = galleryItems[currentIndex].original;
     }
 }
 
-galleriesRef.insertAdjacentHTML('afterbegin', createMarkup);
-galleriesRef.addEventListener('click', openModal);
-closeBtnRef.addEventListener('click', closeModal);
-backdropOverlayRef.addEventListener('click', closeModal);
