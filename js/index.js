@@ -36,6 +36,8 @@ function openModal(event) {
 function closeModal() {
     lightboxRef.classList.remove('is-open');
     lightBoxImageRef.src = '';
+    removeEventListener('click', closeModal);
+    removeEventListener('keydown', keyPress);
 }
 
 function keyPress(event) {
